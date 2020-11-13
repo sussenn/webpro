@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-type JsonParse struct{}
+//type JsonParse struct{}
 
 //json参数 解析工具
 func Decode(io io.ReadCloser, v interface{}) error {

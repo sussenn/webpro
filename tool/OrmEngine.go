@@ -20,6 +20,7 @@ func OrmEngine(cfg *Config) (*Orm, error) {
 	database := cfg.Database
 	conn := database.User + ":" + database.Password + "@tcp(" + database.Host + ":" + database.Port + ")/" +
 		database.DbName + "?charset=" + database.Charset
+	//启动引擎
 	engine, err := xorm.NewEngine("mysql", conn)
 	if err != nil {
 		log.Println("xorm.NewEngine() err: ", err)
@@ -30,7 +31,9 @@ func OrmEngine(cfg *Config) (*Orm, error) {
 
 	//数据库表映射实体类, 可映射多张表...
 	err = engine.Sync2(new(model.SmsCode),
-		new(model.Member))
+		new(model.Member),
+		new(model.FoodCategory),
+		new(model.Shop))
 	if err != nil {
 		log.Println("engine.Sync2() err: ", err)
 		return nil, err
@@ -38,6 +41,7 @@ func OrmEngine(cfg *Config) (*Orm, error) {
 
 	orm := new(Orm)
 	orm.Engine = engine
+	//全局变量,方便初始化Dao
 	DbEngine = orm
 	return orm, nil
 }

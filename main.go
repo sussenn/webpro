@@ -10,10 +10,12 @@ import (
 	"webpro/tool"
 )
 
-//go get -u github.com/aliyun/alibaba-cloud-sdk-go		阿里云...
+//go get -u github.com/aliyun/alibaba-cloud-sdk-go		阿里云短信
 //go get -u github.com/go-xorm/xorm						持久层框架X-ORM
 //go get -u github.com/mojocn/base64Captcha 			图形验证码
 //go get -u github.com/go-redis/redis					redis
+//go get -u github.com/gin-contrib/sessions				session
+//go get -u github.com/tedcy/fdfs_client				fastDFS
 func main() {
 	cfg, err := tool.ParseConfig("./config/app.json")
 	if err != nil {
@@ -32,6 +34,9 @@ func main() {
 	app := gin.Default()
 	//设置允许跨域
 	app.Use(Cors())
+	//gin配置session		(gin本身不支持session)
+	tool.InitSession(app)
+
 	//注入Controller
 	registerRouter(app)
 	_ = app.Run(cfg.AppHost + ":" + cfg.AppPort)
@@ -41,6 +46,8 @@ func main() {
 func registerRouter(router *gin.Engine) {
 	new(controller.HelloController).Router(router)
 	new(controller.MemberController).Router(router)
+	new(controller.FoodCategoryController).Router(router)
+	new(controller.ShopController).Router(router)
 }
 
 //设置允许跨域访问

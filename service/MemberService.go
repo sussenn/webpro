@@ -86,3 +86,35 @@ func (ms *MemberService) SmsLogin(loginParam param.SmsLoginParam) *model.Member 
 	user.Id = memberDao.InsertMember(user)
 	return &user
 }
+
+//用户名+密码 登录
+func (ms *MemberService) Login(name string, password string) *model.Member {
+	//根据用户名+密码查询用户信息
+	md := dao.MemberDao{Orm: tool.DbEngine}
+	member := md.Query(name, password)
+	if member.Id != 0 {
+		return member
+	}
+	//查不到则新增用户
+	user := model.Member{}
+	user.UserName = name
+	//密码加密
+	user.Password = tool.EncoderSha256(password)
+	user.RegisterTime = time.Now().Unix()
+
+	//插入数据库,返回自增id
+	id := md.InsertMember(user)
+	user.Id = id
+	log.Println("未查询到用户,进行用户注册,用户name:", user.UserName)
+	return &user
+}
+
+//头像上传 更新用户头像信息
+func (ms *MemberService) UploadAvatar(userId int64, fileName string) string {
+	memberDao := dao.MemberDao{Orm: tool.DbEngine}
+	result := memberDao.UploadAvatar(userId, fileName)
+	if result == 0 {
+		return ""
+	}
+	return fileName
+}

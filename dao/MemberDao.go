@@ -47,3 +47,26 @@ func (md *MemberDao) InsertMember(member model.Member) int64 {
 	}
 	return result
 }
+
+//根据用户名+密码查询
+func (md *MemberDao) Query(name string, password string) *model.Member {
+	var member model.Member
+	password = tool.EncoderSha256(password)
+	_, err := md.Where("user_name = ? and password = ?", name, password).Get(&member)
+	if err != nil {
+		log.Println("Query() err: ", err)
+		return nil
+	}
+	return &member
+}
+
+//用户头像上传
+func (md *MemberDao) UploadAvatar(userId int64, fileName string) int64 {
+	member := model.Member{Avatar: fileName}
+	result, err := md.Where("id = ?", userId).Update(&member)
+	if err != nil {
+		log.Println("UploadAvatar() err: ", err)
+		return 0
+	}
+	return result
+}
